@@ -1,9 +1,12 @@
 package com.game.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.game.Play;
 
-public interface PlayRepository extends CrudRepository<Play, Integer>{
+public interface PlayRepository extends JpaRepository<Play, Integer>{
+	
 
 }
