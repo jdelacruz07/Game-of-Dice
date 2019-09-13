@@ -1,23 +1,20 @@
 package com.game;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-
 @Entity
 public class Ranking {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idRanking;
 	private int idPlayer;
 	private String name;
 	private int isWin;
-	private double avg;
 	
 	
 	/**
@@ -71,20 +68,10 @@ public class Ranking {
 	/**
 	 * @return the avg
 	 */
-	public double getAvg() {
-		return avg;
-	}
-	/**
-	 * @param avg the avg to set
-	 */
-	public void setAvg(double avg) {
-		this.avg = avg;
-	}
-	
 	@Override
 	public String toString() {
 		return "Ranking [idRanking=" + idRanking + ", idPlayer=" + idPlayer + ", name=" + name + ", isWin=" + isWin
-				+ ", avg=" + avg + "]";
+				+ "]";
 	}
 	
 	

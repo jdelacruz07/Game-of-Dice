@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 public class Play {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPlay;
 	private int diceOne;
 	private int diceTwo;

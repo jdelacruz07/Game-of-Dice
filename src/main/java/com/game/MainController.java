@@ -2,14 +2,11 @@ package com.game;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,18 +31,19 @@ public class MainController implements WebMvcConfigurer {
 
 	PlayRepository playRepository;
 	PlayerRepository playerRepository;
-	@Autowired
 	RankingRepository rankingRepository;
 
-	@Autowired
-	public MainController(PlayRepository playRepository, PlayerRepository playerRepository) {
+
+	public MainController(PlayRepository playRepository, PlayerRepository playerRepository,
+			RankingRepository rankingRepository) {
 		super();
 		this.playRepository = playRepository;
 		this.playerRepository = playerRepository;
+		this.rankingRepository = rankingRepository;
 	}
 
 	///////////////////// Parte de la vista para insertar jugador
-	///////////////////// //////////////////////////
+	///////////////////// ////////////////////////////////////////////////////////////////
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/results").setViewName("results");
@@ -58,6 +56,7 @@ public class MainController implements WebMvcConfigurer {
 	}
 
 	@PostMapping("/")
+	@Transactional
 	public String checkPersonInfo(@Valid Player player, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
@@ -67,54 +66,64 @@ public class MainController implements WebMvcConfigurer {
 		return "redirect:/results";
 	}
 
+	@GetMapping("/web")
+	public String getPlayer(Model model) {
+		model.addAttribute("players", playerRepository.findAll());
+		return "player";
+	}
 	////////////////////////////////////////////////////////////////////////////////////////
 
+	//#################################          1           ###############################
 	@PostMapping
 	@ResponseBody
+	@Transactional
 	public void createPlayer(@RequestBody Player newPlayer) {
 		playerRepository.save(newPlayer);
 	}
 
+	//#################################          2           ###############################
 	@PutMapping
 	@ResponseBody
+	@Transactional
 	public void updatePlayer(@RequestBody Player newPlayer) {
 		playerRepository.save(newPlayer);
 	}
 
+	//#################################          3           ###############################
 	@PostMapping(path = "/{idPlayer}/games")
 	@ResponseBody
+	@Transactional
 	public void createPlay(@PathVariable("idPlayer") int id, @RequestBody Play newPlay) {
 		Player player = new Player();
 		player.setIdPlayer(id);
-		System.out.println(id);
 		newPlay.setPlayer(player);
 		playRepository.save(newPlay);
 	}
 
+	//#################################          4           ###############################
 	@DeleteMapping(path = "/{id}")
 	@ResponseBody
 	public void deletePlayer(@PathVariable("id") int id) {
 		playerRepository.deleteById(id);
 	}
 
+	//#################################          5           ###############################
 	@DeleteMapping(path = "/{id}/games")
 	@ResponseBody
 	public void deletePlay(@PathVariable("id") int id) {
 		playRepository.deleteById(id);
 	}
 
-	@GetMapping("/web")
-	public String getPlayer(Model model) {
-		model.addAttribute("players", playerRepository.findAll());
-		return "player";
-	}
 
+	//#################################          6           ###############################
 	@GetMapping
 	@ResponseBody
+	@Transactional
 	public Iterable<Player> getPlayer() {
 		return playerRepository.findAll();
 	}
 
+	//#################################          7           ###############################
 	@GetMapping(path = "/{id}/games")
 	@ResponseBody
 	public List<Play> getPlayId(@PathVariable("id") int id) {
@@ -131,86 +140,60 @@ public class MainController implements WebMvcConfigurer {
 		return playid;
 	}
 
+	//#################################          8           ###############################
 	@GetMapping(path = "/ranking")
 	@ResponseBody
-	public Iterator<Ranking> getPlayerRanking() {
-		List<Ranking> ranking = rankingRepository.OrderByIdPlayer();
-		int i = 0;
-		int total = 0;
-		int isWin = 0;
-		int idPlayer = 0;
-		int lastPlayer = 0;
-		String name = null;
-		double avg = 0;
-		List<Ranking> ranking4 = new ArrayList<>();
-		for (Ranking ranking2 : ranking) {
-			total = total + 1;
-			isWin = ranking2.getIsWin();
-			idPlayer = ranking2.getIdPlayer();
-			name = ranking2.getName();
-			System.out.println(idPlayer);
-			System.out.println(lastPlayer);
-			if (isWin == 1 && (idPlayer == lastPlayer || lastPlayer == 0)) {
-				System.out.println("#################### 1");
-				i = i + 1;
-				avg = 100 * i / total;
-			} else {
-				if (isWin == 1 && (idPlayer != lastPlayer || lastPlayer == 0)) {
-					System.out.println("#################### 2");
-					i = i + 1;
-					avg = 100 * i / total;
-					Ranking ranking3 = new Ranking();
-					ranking3.setIdPlayer(idPlayer);
-					ranking3.setName(name);
-					ranking3.setAvg(avg);
-					ranking4.add(ranking3);
-					i = 0;
-					total = 0;
-				} else {
-					if (isWin == 0 && (idPlayer != lastPlayer || lastPlayer == 0)) {
-						System.out.println("#################### 3");
-						Ranking ranking3 = new Ranking();
-						ranking3.setIdPlayer(idPlayer);
-						ranking3.setName(name);
-						ranking3.setAvg(avg);
-						ranking4.add(ranking3);
-						i = 0;
-						total = 0;
-
-					} else {
-						System.out.println("#################### 4");
-						avg = 100 * i / total;
-						Ranking ranking3 = new Ranking();
-						ranking3.setIdPlayer(idPlayer);
-						ranking3.setName(name);
-						ranking3.setAvg(avg);
-						ranking4.add(ranking3);
-						i = 0;
-						total = 0;
-
-					}
-				}
-
-			}
-
-			System.out.println(avg);
-			System.out.println("Ganadoras " + i);
-			System.out.println("Total " + total);
-			lastPlayer = idPlayer;
+	@Transactional
+	public List<Ranking> getPlayerRanking() {
+		List<Play> play = playRepository.findAll();
+		List<Ranking>ranking = new ArrayList<>();
+		Ranking ranking1 = new Ranking();
+		int i =0;
+		System.out.println("#####################  1 ");
+		for (Play play2 : play) {
+			ranking1.setIdPlayer(play2.getPlayer().getIdPlayer());
+			ranking1.setName(play2.getPlayer().getName());
+			ranking1.setIsWin(play2.getIsWin());
+			System.out.println(ranking1);
+			ranking.add(ranking1);
+			rankingRepository.save(ranking1);
 		}
-
-		return ranking4.iterator();
+		System.out.println("#####################  2 ");
+		for (Ranking ranking2 : ranking) {
+			System.out.println(" ");
+			System.out.println(ranking2);
+		}
+		return ranking;
 	}
+//			if (idPlayer == lastPlayer || lastPlayer == 0) {
+//				System.out.println("############################### 1 ");
+//				if (lastPlayer != 0 && isWin == 1) {
+//					i = i + 1;
+//				}
+//			} else {
+//				System.out.println("############################### 2 ");
+//				rankingRepository.save(rank);
+//				rank2.add(rank);
+//				total = 1;
+//				i = 0;
+//				if (lastPlayer != 0 && isWin == 1) {
+//					i = i + 1;
+//				}
+//			}
+//			
+	
 
+	//#################################          9           ###############################
 	@GetMapping(path = "/ranking/loser")
 	@ResponseBody
-	public Iterable<Player> getPlayerSortDesc(@RequestBody Player newPlayer) {
+	public Iterable<Player> getPlayerLoser(@RequestBody Player newPlayer) {
 		return playerRepository.findAll();
 	}
 
+	//#################################          10          ###############################
 	@GetMapping(path = "/ranking/winner")
 	@ResponseBody
-	public Iterable<Player> getPlayerSortAsc(@RequestBody Player newPlayer) {
+	public Iterable<Player> getPlayerWinner(@RequestBody Player newPlayer) {
 		return playerRepository.findAll();
 	}
 

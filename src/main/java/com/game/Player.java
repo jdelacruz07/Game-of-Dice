@@ -13,14 +13,12 @@ import javax.validation.constraints.Size;
 public class Player {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int idPlayer;
 	@NotNull
     @Size(min=2, max=40)
 	private String name;
-	
-	
-	
+	private double avg;
 	/**
 	 * @return the idPlayer
 	 */
@@ -45,9 +43,21 @@ public class Player {
 	public void setName(String name) {
 		this.name = name;
 	}
+	/**
+	 * @return the avg
+	 */
+	public double getAvg() {
+		return avg;
+	}
+	/**
+	 * @param avg the avg to set
+	 */
+	public void setAvg(double avg) {
+		this.avg = avg;
+	}
 	@Override
 	public String toString() {
-		return "Player [idPlayer=" + idPlayer + ", name=" + name + "]";
+		return "Player [idPlayer=" + idPlayer + ", name=" + name + ", avg=" + avg + "]";
 	}
 	
 	
