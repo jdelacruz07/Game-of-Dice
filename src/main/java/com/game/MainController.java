@@ -7,7 +7,9 @@ import java.util.List;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +25,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.game.repository.PlayRepository;
 import com.game.repository.PlayerRepository;
-import com.game.repository.RankingRepository;
 
 @Controller
 @RequestMapping(path = "/players")
@@ -31,15 +32,12 @@ public class MainController implements WebMvcConfigurer {
 
 	PlayRepository playRepository;
 	PlayerRepository playerRepository;
-	RankingRepository rankingRepository;
-
-
-	public MainController(PlayRepository playRepository, PlayerRepository playerRepository,
-			RankingRepository rankingRepository) {
+	
+	
+	public MainController(PlayRepository playRepository, PlayerRepository playerRepository) {
 		super();
 		this.playRepository = playRepository;
 		this.playerRepository = playerRepository;
-		this.rankingRepository = rankingRepository;
 	}
 
 	///////////////////// Parte de la vista para insertar jugador
@@ -136,7 +134,6 @@ public class MainController implements WebMvcConfigurer {
 				playid.add(play2);
 			}
 		}
-
 		return playid;
 	}
 
@@ -144,57 +141,74 @@ public class MainController implements WebMvcConfigurer {
 	@GetMapping(path = "/ranking")
 	@ResponseBody
 	@Transactional
-	public List<Ranking> getPlayerRanking() {
-		List<Play> play = playRepository.findAll();
-		List<Ranking>ranking = new ArrayList<>();
-		Ranking ranking1 = new Ranking();
-		int i =0;
-		System.out.println("#####################  1 ");
-		for (Play play2 : play) {
-			ranking1.setIdPlayer(play2.getPlayer().getIdPlayer());
-			ranking1.setName(play2.getPlayer().getName());
-			ranking1.setIsWin(play2.getIsWin());
-			System.out.println(ranking1);
-			ranking.add(ranking1);
-			rankingRepository.save(ranking1);
+	public List<Play> getPlayerRanking() {
+		List<Play> play1 = playRepository.OrderByPlayer();
+		int lastPlayer = 0;
+		int total = 0;
+		int total2 = 0;
+		int count = play1.size();
+		int i = 0;
+		List<Play> play4 = new ArrayList<>();
+		Play play8 = new Play();
+		for (Play play2 : play1) {
+			total2 = 1 + total2;
+			total = 1 + total;
+
+			Player player2 = new Player();
+			Play play6 = new Play();
+			
+			int isWin = play2.getIsWin();
+			player2 = play2.getPlayer();
+			int idPlayer = player2.getIdPlayer(); 
+			double avg = player2.getAvg();
+
+			if (idPlayer == lastPlayer || lastPlayer == 0) {
+				if (lastPlayer != 0 && isWin == 1) {
+					i = i + 1;
+				} else {
+					if (lastPlayer == 0 && isWin == 1) {
+						i = i + 1;
+					}
+				}
+			} else {
+				play6 = play8;
+				play4.add(play6);
+				total = 1;
+				i = 0;
+				if (lastPlayer != 0 && isWin == 1) {
+					i = i + 1;
+				}
+			}
+			
+			lastPlayer = idPlayer;
+			avg = 100*i/total;
+			player2.setAvg(avg);
+			play2.setPlayer(player2);
+			play8 = play2;
+			if (total2 == count) {
+				play4.add(play2);
+			}
 		}
-		System.out.println("#####################  2 ");
-		for (Ranking ranking2 : ranking) {
-			System.out.println(" ");
-			System.out.println(ranking2);
-		}
-		return ranking;
+		return play4;
 	}
-//			if (idPlayer == lastPlayer || lastPlayer == 0) {
-//				System.out.println("############################### 1 ");
-//				if (lastPlayer != 0 && isWin == 1) {
-//					i = i + 1;
-//				}
-//			} else {
-//				System.out.println("############################### 2 ");
-//				rankingRepository.save(rank);
-//				rank2.add(rank);
-//				total = 1;
-//				i = 0;
-//				if (lastPlayer != 0 && isWin == 1) {
-//					i = i + 1;
-//				}
-//			}
-//			
 	
 
 	//#################################          9           ###############################
 	@GetMapping(path = "/ranking/loser")
 	@ResponseBody
-	public Iterable<Player> getPlayerLoser(@RequestBody Player newPlayer) {
-		return playerRepository.findAll();
+	public Player getPlayerLoser() {
+		List<Player> player = playerRepository.OrderByAvgAsc();
+		
+		return player.get(0);
 	}
 
 	//#################################          10          ###############################
 	@GetMapping(path = "/ranking/winner")
 	@ResponseBody
-	public Iterable<Player> getPlayerWinner(@RequestBody Player newPlayer) {
-		return playerRepository.findAll();
+	public Player getPlayerWinner() {
+		List<Player> player = playerRepository.OrderByAvgDesc();
+		
+		return player.get(0);
 	}
 
 }

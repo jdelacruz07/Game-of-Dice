@@ -19,6 +19,8 @@ public class Player {
     @Size(min=2, max=40)
 	private String name;
 	private double avg;
+	
+	
 	/**
 	 * @return the idPlayer
 	 */

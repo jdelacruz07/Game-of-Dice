@@ -9,6 +9,8 @@ import com.game.Play;
 
 public interface PlayRepository extends JpaRepository<Play, Integer>{
 	
-	@Query("select  p from Play p order by p.idPlay")
-	List<Play> OrderByIdPlay();
+	@Query("select  p from Play p order by p.player")
+	List<Play> OrderByPlayer();
+	
+	
 }
