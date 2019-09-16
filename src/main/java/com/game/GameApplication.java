@@ -27,10 +27,10 @@ public class GameApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		String wishPlay = null;
 		do { 
-			playGame();
+		wishPlay =	playGame();
 		}
 		while (wishPlay == "y");
-		playGame();
+		wishPlay = playGame();
 	}
 
 	private String playGame(){
@@ -56,7 +56,7 @@ public class GameApplication implements CommandLineRunner {
 		} else {
 			System.out.println("idPlayer inCorrecto ");
 		}
-		System.out.println("Quieres Volver a jugar (y/n) ");
+		System.out.println("Quieres volver a jugar (y/n) ");
 		return wishPlay = sc.next();
 		
 	}
