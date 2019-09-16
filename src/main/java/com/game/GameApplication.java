@@ -25,6 +25,16 @@ public class GameApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		String wishPlay = null;
+		do { 
+			playGame();
+		}
+		while (wishPlay == "y");
+		playGame();
+	}
+
+	private String playGame(){
+		String wishPlay = null;
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Dame tu IdPlayer ");
 		int id = sc.nextInt();
@@ -38,6 +48,7 @@ public class GameApplication implements CommandLineRunner {
 			String name = play4.getName();
 			System.out.println("IdPlayer Correcto ");
 			System.out.println(player);
+			
 			System.out.println("Lanza dados (y/n)");
 			String isThrow= sc.next();
 			System.out.println(isThrow);
@@ -45,8 +56,13 @@ public class GameApplication implements CommandLineRunner {
 		} else {
 			System.out.println("idPlayer inCorrecto ");
 		}
+		System.out.println("Quieres Volver a jugar (y/n) ");
+		return wishPlay = sc.next();
+		
 	}
-
+	
+	
+	
 	private void throwDice(String isThrow, int idPlayer, String name) {
 
 		if (isThrow.equals("y")) {
