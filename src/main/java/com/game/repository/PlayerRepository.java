@@ -16,4 +16,6 @@ public interface PlayerRepository extends JpaRepository<Player, Integer> {
 
 	List<Player> findTop3ByOrderByAvgDesc();
 
+	Player findByName(String name);
+
 }

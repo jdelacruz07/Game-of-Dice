@@ -27,63 +27,18 @@ public class PlayerService {
 		playerRepository.save(player);
 	}
 
-	public void deletePlayerById(int id) {
+	public void deleteByIdPlayer(int id) {
 		playerRepository.deleteById(id);
 	}
 
-	public Iterable<Player> getAllPlayers() {
+	public Iterable<Player> getAllPlayer() {
 		return playerRepository.findAll();
 	}
 
-	public List<Play> playerRanking() {
-		List<Play> play1 = playRepository.findByOrderByPlayerAsc();
-		int lastPlayer = 0;
-		int total = 0;
-		int total2 = 0;
-		int count = play1.size();
-		int i = 0;
-		List<Play> play4 = new ArrayList<>();
-		Play play8 = new Play();
-		for (Play play2 : play1) {
-			total2 = 1 + total2;
-			total = 1 + total;
-
-			Player player2 = new Player();
-			Play play6 = new Play();
-
-			int isWin = play2.getIsWin();
-			player2 = play2.getPlayer();
-			int idPlayer = player2.getIdPlayer();
-			double avg = player2.getAvg();
-
-			if (idPlayer == lastPlayer || lastPlayer == 0) {
-				if (lastPlayer != 0 && isWin == 1) {
-					i = i + 1;
-				} else {
-					if (lastPlayer == 0 && isWin == 1) {
-						i = i + 1;
-					}
-				}
-			} else {
-				play6 = play8;
-				play4.add(play6);
-				total = 1;
-				i = 0;
-				if (lastPlayer != 0 && isWin == 1) {
-					i = i + 1;
-				}
-			}
-
-			lastPlayer = idPlayer;
-			avg = 100 * i / total;
-			player2.setAvg(avg);
-			play2.setPlayer(player2);
-			play8 = play2;
-			if (total2 == count) {
-				play4.add(play2);
-			}
-		}
-		return play4;
+	public List<Player> playerRanking() {
+		List<Play> playTotal = playRepository.findByOrderByPlayerAsc();
+		List<Player> playerRank = doRanking(playTotal);
+		return playerRank;
 	}
 
 	public List<Player> playerLoser() {
@@ -95,6 +50,61 @@ public class PlayerService {
 	public List<Player> playerWinner() {
 		List<Player> player = playerRepository.findTopByOrderByAvgDesc();
 
+		return player;
+	}
+
+	public List<Player> doRanking(List<Play> playTotal) {
+		List<Player> playerRank = new ArrayList<>();
+		int countFinal = 0;
+		int lastPlayer = 0;
+		double countWin = 0.0;
+		double countTotal = 0.0;
+		String lastName = null;
+		double average = 0;
+		for (Play play : playTotal) {
+			countFinal++;
+			int idPlayer = play.getPlayer().getIdPlayer();
+			int isWin = play.getIsWin();
+			if ((idPlayer == lastPlayer && isWin == 1) || lastPlayer == 0) {
+				countWin = countWin + 1;
+				countTotal = countTotal + 1;
+			} else if (idPlayer != lastPlayer) {
+				countTotal = countTotal + 1;
+				Player player = updatePlayer(lastPlayer, lastName, average);
+				playerRank.add(player);
+				countWin = 0;
+				average = 0;
+				countTotal = 1;
+				if (isWin == 1) {
+					countWin = 1;
+					countTotal = 1;
+				}
+			} else {
+				if (idPlayer == lastPlayer && isWin == 0) {
+					countTotal = countTotal + 1;
+				}
+			}
+
+			average = countWin * 100 / countTotal;
+			lastName = play.getPlayer().getName();
+			lastPlayer = idPlayer;
+
+			int totalSize = playTotal.size();
+			if (totalSize == countFinal) {
+				Player player = updatePlayer(idPlayer, play.getPlayer().getName(), average);
+				playerRepository.save(player);
+				playerRank.add(player);
+			}
+		}
+		return playerRank;
+	}
+
+	public Player updatePlayer(int lastPlayer, String lastName, double average) {
+		Player player = new Player();
+		player.setIdPlayer(lastPlayer);
+		player.setName(lastName);
+		player.setAvg(average);
+		playerRepository.save(player);
 		return player;
 	}
 }

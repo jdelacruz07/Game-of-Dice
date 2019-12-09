@@ -22,7 +22,7 @@ public class PlayService {
 		playRepository.save(newPlay);
 	}
 
-	public void deletePlayById(int id) {
+	public void deleteByIdPlay(int id) {
 		playRepository.deleteById(id);
 	}
 

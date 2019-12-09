@@ -92,21 +92,21 @@ public class MainController implements WebMvcConfigurer {
 
 	@DeleteMapping(path = "/{id}")
 	@ResponseBody
-	public void deletePlayerId(@PathVariable("id") int id) {
-		playerService.deletePlayerById(id);
+	public void deleteIdPlayer(@PathVariable("id") int id) {
+		playerService.deleteByIdPlayer(id);
 	}
 
 	@DeleteMapping(path = "/{id}/games")
 	@ResponseBody
-	public void deletePlayId(@PathVariable("id") int id) {
-		playService.deletePlayById(id);
+	public void deleteIdPlay(@PathVariable("id") int id) {
+		playService.deleteByIdPlay(id);
 	}
 
 	@GetMapping
 	@ResponseBody
-	public Iterable<Player> getPlayer() {
+	public Iterable<Player> getPlayers() {
 
-		return playerService.getAllPlayers();
+		return playerService.getAllPlayer();
 	}
 
 	@GetMapping(path = "/{id}/games")
@@ -117,7 +117,7 @@ public class MainController implements WebMvcConfigurer {
 
 	@GetMapping(path = "/ranking")
 	@ResponseBody
-	public List<Play> getPlayerRanking() {
+	public List<Player> getPlayerRanking() {
 		return playerService.playerRanking();
 	}
 
