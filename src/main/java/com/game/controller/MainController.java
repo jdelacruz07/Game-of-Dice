@@ -22,8 +22,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.game.domain.Play;
 import com.game.domain.Player;
-import com.game.repository.PlayRepository;
-import com.game.repository.PlayerRepository;
 import com.game.service.PlayService;
 import com.game.service.PlayerService;
 
@@ -31,17 +29,14 @@ import com.game.service.PlayerService;
 @RequestMapping(path = "/players")
 @Transactional
 public class MainController implements WebMvcConfigurer {
-	PlayRepository playRepository;
-	PlayerRepository playerRepository;
-	@Autowired
 	PlayerService playerService;
-	@Autowired
 	PlayService playService;
 
-	public MainController(PlayRepository playRepository, PlayerRepository playerRepository) {
+	@Autowired
+	public MainController(PlayerService playerService, PlayService playService) {
 		super();
-		this.playRepository = playRepository;
-		this.playerRepository = playerRepository;
+		this.playerService = playerService;
+		this.playService = playService;
 	}
 
 	// Parte de la vista para insertar jugador
@@ -67,7 +62,7 @@ public class MainController implements WebMvcConfigurer {
 
 	@GetMapping("/web")
 	public String getPlayer(Model model) {
-		model.addAttribute("players", playerRepository.findAll());
+		model.addAttribute("players", playerService.getAllPlayer());
 
 		return "player";
 	}

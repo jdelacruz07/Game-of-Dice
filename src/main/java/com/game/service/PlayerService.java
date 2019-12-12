@@ -84,7 +84,6 @@ public class PlayerService {
 					countTotal = countTotal + 1;
 				}
 			}
-
 			average = countWin * 100 / countTotal;
 			lastName = play.getPlayer().getName();
 			lastPlayer = idPlayer;
