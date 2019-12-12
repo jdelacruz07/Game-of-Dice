@@ -14,8 +14,8 @@ import com.game.repository.PlayerRepository;
 @Service
 public class Game {
 
-	PlayerRepository playerRepository;
-	PlayRepository playRepository;
+	static PlayerRepository playerRepository;
+	static PlayRepository playRepository;
 
 	@Autowired
 	public Game(PlayerRepository playerRepository, PlayRepository playRepository) {
@@ -24,7 +24,11 @@ public class Game {
 		this.playRepository = playRepository;
 	}
 
-	public String playGame() {
+	public Game() {
+
+	}
+
+	public static String playGame() {
 		String wishPlay = null;
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Dame tu IdPlayer ");
@@ -36,7 +40,7 @@ public class Game {
 		return wishPlay = sc.next();
 	}
 
-	public void verifyPlayer(Scanner sc, Optional<Player> player) {
+	public static void verifyPlayer(Scanner sc, Optional<Player> player) {
 		if (player.isPresent()) {
 			Player play4 = player.get();
 			int idPlayer = play4.getIdPlayer();
@@ -52,7 +56,7 @@ public class Game {
 		}
 	}
 
-	public void throwDice(String isThrow, int idPlayer, String name) {
+	public static void throwDice(String isThrow, int idPlayer, String name) {
 
 		if (isThrow.equals("y")) {
 			Play play = new Play();
